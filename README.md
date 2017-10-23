@@ -1,3 +1,6 @@
+[![Coverage Status](https://coveralls.io/repos/github/ghacupha/excel-object-mapper/badge.svg?branch=master)](https://coveralls.io/github/ghacupha/excel-object-mapper?branch=master)
+
+
 - Add dependency to your project (pom.xml)
 
 ```xml
