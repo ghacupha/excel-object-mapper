@@ -1,5 +1,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/ghacupha/excel-object-mapper/badge.svg?branch=master)](https://coveralls.io/github/ghacupha/excel-object-mapper?branch=master)
 
+[![Build Status](https://travis-ci.org/ghacupha/excel-object-mapper.svg?branch=master)](https://travis-ci.org/ghacupha/excel-object-mapper)
+
 
 - Add dependency to your project (pom.xml)
 
