@@ -28,7 +28,11 @@ public class DoubleTypeConverter implements TypeConverter<Double> {
             try {
                 return Double.valueOf(((String) value).trim());
             } catch (NumberFormatException ex) {
-              log.warn("NumberFormatException encountered while converting : {} to Double",value);
+
+                // Trivial. Could happen now and then
+
+              //log.warn("NumberFormatException encountered while converting : {} string to Double",value);
+
                return null;
             }
         }
