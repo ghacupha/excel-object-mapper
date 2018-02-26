@@ -21,11 +21,11 @@ public class BooleanTypeConverter implements TypeConverter<Boolean> {
         }
 
         if (value instanceof Integer) {
-            //try {
-            value = value.toString().trim();
-            //} catch (Exception ex) {
-            //return Boolean.FALSE;
-            //}
+            try {
+                value = value.toString().trim();
+            } catch (Exception ex) {
+                return Boolean.FALSE;
+            }
         }
 
         if (value instanceof String) {
