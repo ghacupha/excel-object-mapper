@@ -11,5 +11,12 @@ import java.lang.reflect.Field;
  */
 public interface EachFieldCallback {
 
+    /**
+     *
+     * @param field The field to callBack
+     * @param name The name of the field (if given)
+     * @param index The index of the field (if given)
+     * @throws Throwable
+     */
     void each(Field field, String name, Integer index) throws Throwable;
 }

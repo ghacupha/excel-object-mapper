@@ -36,7 +36,7 @@ import io.github.mapper.excel.util.WorkbookCallback;
  */
 public class ExcelMapper {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ExcelMapper.class);
+	private static final Logger log = LoggerFactory.getLogger(ExcelMapper.class);
 
 	private Class<?> clazz;
 	private final Workbook workbook;
@@ -147,26 +147,42 @@ public class ExcelMapper {
 	}
 
 	private <T> void processSheet(List<T> items, int sheetNumber) throws Throwable {
+
+		log.debug("Processing sheet # {}",sheetNumber);
+
 		Sheet sheet = this.workbook.getSheetAt(sheetNumber);
 		Iterator<Row> rowIterator = sheet.iterator();
 
 		Map<Field, Integer> fieldToIndexMap = new HashMap<>();
 
 		while (rowIterator.hasNext()) {
+
 			Row row = rowIterator.next();
+
+			int rowNum = row.getRowNum();
+
+			log.debug("Processing row # : {}",rowNum);
+
 			this.cellHasException = false;
 
-			if (row.getRowNum() == this.headerRowNumber) {
+			if (rowNum == this.headerRowNumber) {
+
 				if (this.fieldToColumnIndex.size() > 0) {
+
 					readExcelHeaderFromMap(fieldToIndexMap);
+
 				} else {
+
 					readExcelHeaderFromAnnotations(row, fieldToIndexMap);
 				}
 			} else {
 
 				if ((this.startRowNumber == null || row.getRowNum() >= this.startRowNumber)
 						&& (this.endRowNumber == null || row.getRowNum() <= this.endRowNumber)) {
+
 					T readExcelContent = (T) readExcelContent(row, fieldToIndexMap);
+
+                    log.debug("Item : {} has been read...",readExcelContent);
 
 					if (!this.cellHasException || this.mustMapRowThatCellsHaveException) {
 						items.add(readExcelContent);
@@ -190,16 +206,17 @@ public class ExcelMapper {
 
 	private void readExcelHeaderFromAnnotations(final Row row, final Map<Field, Integer> fieldToIndexMap)
 			throws Throwable {
-		ReflectionUtils.eachFields(clazz, new EachFieldCallback() {
-			@Override
-			public void each(Field field, String name, Integer index) throws Throwable {
-				if (name != null) {
-					mapNameToIndex(field, name, row, fieldToIndexMap);
-				} else {
-					fieldToIndexMap.put(field, index);
-				}
-			}
-		});
+		ReflectionUtils.eachFields(clazz, (field, name, index) -> {
+
+            log.debug("Mapping fields fo clazz : {}",clazz);
+            if (name != null) {
+                log.debug("Mapping name : {} with field : {} in row# {} in the fieldToIndexMap : {}",name,field,row.getRowNum(),fieldToIndexMap);
+                mapNameToIndex(field, name, row, fieldToIndexMap);
+            } else {
+                log.debug("No name has been given for the field : {}, therefore mapping {} to index# {}",field,field,index);
+                fieldToIndexMap.put(field, index);
+            }
+        });
 	}
 
 	private void mapNameToIndex(Field field, String name, Row row, Map<Field, Integer> cells) {
@@ -210,36 +227,48 @@ public class ExcelMapper {
 	}
 
 	private int findIndexCellByName(String name, Row row) {
-		Iterator<Cell> iterator = row.cellIterator();
+        log.debug("Searching index for : {}",name);
+        Iterator<Cell> iterator = row.cellIterator();
 		while (iterator.hasNext()) {
 			Cell cell = iterator.next();
-			if (getCellValue(cell).trim().equalsIgnoreCase(name)) {
-				return cell.getColumnIndex();
+            log.debug("Checking cell : {}",cell.getColumnIndex());
+            if (getCellValue(cell).trim().equalsIgnoreCase(name)) {
+                int nameIndex = cell.getColumnIndex();
+                log.debug("Found index for name : {} as = {}",name,nameIndex);
+                return nameIndex;
 			}
 		}
 
-		return -1;
+        log.debug("Index for name : {} not found returning -1",name);
+        return -1;
 	}
 
 	private Object readExcelContent(final Row row, final Map<Field, Integer> fieldToIndexMap) throws Throwable {
-		final Object instance = clazz.newInstance();
 
-		Iterator<Entry<Field, Integer>> iterator = fieldToIndexMap.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<Field, Integer> next = iterator.next();
-			Cell cell = row.getCell(next.getValue());
-			try {
-				ReflectionUtils.setValueOnField(instance, next.getKey(), getCellValue(cell));
-			} catch (Exception e) {
-				this.cellHasException = true;
-				LOG.error("Error raise on Sheet: " + row.getSheet().getSheetName() + ", Row: " + row.getRowNum()
-						+ ", Cell: " + cell.getColumnIndex());
-				e.printStackTrace();
-				if (this.handleCellExceptions) {
-					setCellBackground(row, cell.getColumnIndex(), cellExceptionBackground);
-				}
-			}
-		}
+        log.debug("Reading excel content at row : {} using filedMap : {}",row.getRowNum(),fieldToIndexMap.entrySet());
+
+        final Object instance = clazz.newInstance();
+        log.debug("Instance : {} has been instantiated from the class : {}",instance,clazz);
+
+        fieldToIndexMap.forEach((key, value) -> {
+            Cell cell = row.getCell(value);
+            log.debug("Setting field value on {} @field : {} from cell# : {}",instance,key,cell.getColumnIndex());
+            try {
+                ReflectionUtils.setValueOnField(instance, key, getCellValue(cell));
+            } catch (Exception e) {
+                this.cellHasException = true;
+                String sheetName = row.getSheet().getSheetName();
+                int rowNum = row.getRowNum();
+                int cellindex = cell.getColumnIndex();
+
+                log.error("Exception encountered on Sheet: {} at row# {}, on column# {}",sheetName,rowNum,cellindex);
+                e.printStackTrace();
+                if (this.handleCellExceptions) {
+                    //TODO replace with suitable methods under new POI version...
+                    //setCellBackground(row, cell.getColumnIndex(), cellExceptionBackground);
+                }
+            }
+        });
 
 		return instance;
 	}
@@ -265,12 +294,12 @@ public class ExcelMapper {
 		return value;
 	}
 
-	private static Boolean setCellBackground(Row row, int colNum, CellStyle cellBackground) {
+	/*private static Boolean setCellBackground(Row row, int colNum, CellStyle cellBackground) {
 		Cell cell = row.getCell(colNum);
 		if (cell == null)
 			row.createCell(colNum).setCellStyle(cellBackground);
 		else
 			row.getCell(colNum).setCellStyle(cellBackground);
 		return false;
-	}
+	}*/
 }

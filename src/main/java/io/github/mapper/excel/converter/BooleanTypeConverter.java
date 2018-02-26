@@ -22,24 +22,24 @@ public class BooleanTypeConverter implements TypeConverter<Boolean> {
 
         if (value instanceof Integer) {
             //try {
-                value = value.toString().trim();
+            value = value.toString().trim();
             //} catch (Exception ex) {
-                //return Boolean.FALSE;
+            //return Boolean.FALSE;
             //}
         }
 
         if (value instanceof String) {
-            //try {
-			if (((String) value).trim().equals("false")) {
-				return Boolean.FALSE;
-			} else if (((String) value).trim().equals("true")) {
-				return Boolean.TRUE;
-			} else {
-				value = BigDecimal.valueOf(Long.parseLong(((String) value).trim()));
-			}
-            //} catch (Exception ex) {
-                //return Boolean.FALSE;
-            //}
+            try {
+                if (((String) value).trim().equals("false")) {
+                    return Boolean.FALSE;
+                } else if (((String) value).trim().equals("true")) {
+                    return Boolean.TRUE;
+                } else {
+                    value = BigDecimal.valueOf(Long.parseLong(((String) value).trim()));
+                }
+            } catch (Exception ex) {
+                return Boolean.FALSE;
+            }
         }
 
         if (value instanceof BigDecimal) {
