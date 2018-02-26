@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DoubleTypeConverter implements TypeConverter<Double> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DoubleTypeConverter.class);
+    private static final Logger log = LoggerFactory.getLogger(DoubleTypeConverter.class);
     
     @Override
     public Double convert(Object value, String... pattern) {
@@ -27,8 +27,8 @@ public class DoubleTypeConverter implements TypeConverter<Double> {
         if (value instanceof String) {
             try {
                 return Double.valueOf(((String) value).trim());
-            } catch (Exception ex) {
-              LOG.warn(null, ex);
+            } catch (NumberFormatException ex) {
+              log.warn("NumberFormatException encountered while converting : {} to Double",value);
                return null;
             }
         }
