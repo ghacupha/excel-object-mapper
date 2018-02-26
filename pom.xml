@@ -4,7 +4,7 @@
 
 	<groupId>io.github.mohsen-mahmoudi</groupId>
 	<artifactId>excel-object-mapper</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.0.RC2</version>
 	<packaging>jar</packaging>
 
 	<name>excel-object-mapper</name>
@@ -80,12 +80,14 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>3.13</version>
+            <scope>compile</scope>
 		</dependency>
 		<!-- apache poi excel ********************************************** -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.13</version>
+            <scope>compile</scope>
 			<type>jar</type>
 		</dependency>
 
