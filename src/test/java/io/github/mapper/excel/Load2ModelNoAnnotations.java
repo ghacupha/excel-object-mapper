@@ -36,7 +36,7 @@ public class Load2ModelNoAnnotations {
         List<UnAnnotizedModel> items2 = null;
 
         try {
-            items2 = ExcelMapper.mapFromExcel(new File("D:\\workspaces\\poijiWorkspace\\excel-object-mapper\\src\\main\\resources\\excel2.xlsx"))
+            items2 = ExcelMapper.mapFromExcel(excelFile2)
                     .toObjectOf(UnAnnotizedModel.class)
                     .fromSheet(0)
                     .mapFieldFrom(fieldToColumnIndex)
